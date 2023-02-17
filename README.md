@@ -13,7 +13,7 @@
 [FAQ](#faq)  •
 [Contribute](#want-to-contribute)
 
-![MOTD screenshot](readme-head.png)
+![MOTD screenshot](readme-head.gif)
 
 </div>
 
@@ -44,7 +44,16 @@ sudo motd-config
 
 ### Configuration
 #### Theme (flavor)
-Is pretty self explanatory: each has its own icon anc accent color
+Is pretty self explanatory: each has its own icon and accent color.
+Currently supported "flavors":
+- Annex
+- BTT
+- Fluidd
+- Klipper
+- Mainsail
+- OctoPrint
+- RatOS
+- Voron
 
 #### Available variants
 Variant  1 (labels)
