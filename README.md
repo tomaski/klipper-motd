@@ -27,17 +27,18 @@ As I SSH into my printers quite frequently, I got bored with the standard, gener
 
 First, SSH into your Raspberry and download this reposiitory
 ```bash
-$ git clone https://www.github.com/tomaski/klipper-motd.git
+git clone https://www.github.com/tomaski/klipper-motd.git
 ```
 
-Installation is done by running the `setup.sh` command with proper flag
+Installation is done by making the `setup.sh` executable and running it with proper flag
 ```bash
-$ sudo ./klipper-motd/setup.sh --install
+chmod +x ./klipper-motd/setup.sh
+sudo ./klipper-motd/setup.sh --install
 ```
 
 After that it's just a matter of running the configurator, where you can adjust the MoTD to your liking
 ```bash
-$ sudo motd-config
+sudo motd-config
 ```
 
 
@@ -69,11 +70,11 @@ Will always use the `variant` settings.
 ### Removal
 If you no longer wish to use this MoTD simply run `setup.sh` command with `--uninstall` flag and the script will remove all `klipper-motd` files from your system and revert any changes made during installation.
 ```bash
-$ sudo ./klipper-motd/setup.sh --remove
+sudo ./klipper-motd/setup.sh --remove
 ```
 after that, remove the `klipper-motd` directory
 ```bash
-$ rm -rf ./klipper-motd/
+rm -rf ./klipper-motd/
 ```
 
 ## FAQ
@@ -87,7 +88,7 @@ Currently, the configurator does not support editing services list, so if you wi
 > service names are case sensitive! 
 > Run `systemctl list-units --type=service` to see which services are known to the system and what their names are. You need to use that name (without `.service`)
 ```bash
-$ sudo nano /etc/motd.update.d/10-klipper-motd
+sudo nano /etc/motd.update.d/10-klipper-motd
 ```
 
 The services to be displayed are stored here
@@ -101,20 +102,20 @@ SERVICES=("klipper" "moonraker" "crowsnest" "KlipperScreen")
 ### Q: How to edit colors?
 Editing colors is also not supported in configurator, so in order to tweak the theme to your liking, you'd need to make manual edits
 ```bash
-$ sudo nano /etc/motd.update.d/10-klipper-motd
+sudo nano /etc/motd.update.d/10-klipper-motd
 ```
 the color definitions used, are clearly described inside this file. This link might come in handy for color codes [bash colors cheat sheet](https://www.ditig.com/256-colors-cheat-sheet)
 
 ### Q: How to add more logos?
 First of all, you need [util-say](https://github.com/maandree/util-say) which needs OpenJDK (as util-say is Java based) version 6 and 7 - but Raspberry OS based system nowadays come with versions 11 and 17. So you'd either need older Linux distribution (Ubuntu 18.04 is confirmed to be working) or find a way to install v6 (I won't be covering it). Then it's matter of installing needed packages
 ```bash
-$ sudo apt-get install imagemagick openjdk-6-jdk coreutils perl
+sudo apt-get install imagemagick openjdk-6-jdk coreutils perl
 ```
 and downloading the `util-say`
 ```bash
-$ git clone https://github.com/maandree/util-say
-$ cd util-say
-$ make
+git clone https://github.com/maandree/util-say
+cd util-say
+make
 ```
 then just download your image
 ```bash
@@ -122,11 +123,11 @@ wget URL_OF_YOUR_PICTURE -O myimage.png
 ```
 and convert it to text-based representation
 ```bash
-$ ./ponytool --import image --magnified 20 --file myimage.png --balloon n --export ponysay --platform xterm --chroma 1 --right 0 --left 0 --top 0 --bottom 0 > converted_image
+./ponytool --import image --magnified 20 --file myimage.png --balloon n --export ponysay --platform xterm --chroma 1 --right 0 --left 0 --top 0 --bottom 0 > converted_image
 ```
 the text-based image will be saved to `converted_image` file. To view it, simply type
 ```bash
-$ cat converted_image
+cat converted_image
 ```
 If the size is wrong, you need to adjust the `--magnified` parameter. For images that are 1024px x 1024px the magnification of about `20` is good starting point. Smaller image sizes need lower magnification value.
 

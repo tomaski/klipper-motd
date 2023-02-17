@@ -3,6 +3,8 @@
 # abort if anything goes sideways
 set -eu -o pipefail
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 # are we running with elevated permissions?
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root."
@@ -23,7 +25,7 @@ get_help(){
             The MoTD files will be placed at their inended locations.
             Additionaly, certain system settings will be changed. 
 
-        -u, --uninstall
+        -r, --remove
             The MoTD files will be removed from the system,
             and all changes reverted.
 
@@ -58,7 +60,7 @@ install_motd(){
     fi
 
     mkdir -p /etc/update-motd.d
-    cp -r files/* /etc/update-motd.d/
+    cp -r $SCRIPT_DIR/files/* /etc/update-motd.d/
     chmod +x /etc/update-motd.d/10-klipper-motd
     echo "> Copied the klipper MoTD files."
 
@@ -67,7 +69,7 @@ install_motd(){
         echo "> Installed necessary 'figlet' package."
     fi
 
-    chmod +x motd-config
+    chmod +x $SCRIPT_DIR/motd-config
     cp motd-config /usr/bin/motd-config
     echo "> Installed the MoTD configurator."
 }
