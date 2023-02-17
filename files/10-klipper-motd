@@ -1,0 +1,191 @@
+#!/bin/bash
+
+OS_FLAVOR="klipper"
+CUSTOM_HEADER_TEXT=""
+COLOR_VARIANT=2
+COLORED_UPDATES=true
+SERVICES=("klipper" "moonraker" "crowsnest" "KlipperScreen")
+SERVICES_COLUMNS=2
+
+# START COLOR DEFINITION SECTION
+# below are all colors used in this script
+
+# define accent colors for each flavor
+RG="\e[38;5;82m"   # ratrig green
+AG="\e[38;5;29m"   # annex green
+VR="\e[38;5;161m"  # voron red
+MR="\e[38;5;160m"  # mainsail red
+BR="\e[38;5;124m"  # btt red
+KR="\e[38;5;131m"  # klipper red
+FB="\e[38;5;33m"   # fluidd blue
+OG="\e[38;5;34m"   # octoprint green
+
+# define standard colors for rest of the text
+CW="\e[38;5;255m"  # color white
+CG="\e[38;5;241m"  # color grey
+CE="\e[38;5;160m"  # color error
+CX="\e[38;5;214m"  # color warning
+CC="\e[0m"         # color clear
+
+# define colors for service status arrows
+SU="\e[38;5;40m"   # service up
+SD="\e[38;5;160m"  # service down
+
+# Logic for switching theme accent colors depending on user choice
+case ${OS_FLAVOR} in
+    "ratos")
+        FC=${RG}
+        ;;
+    "annex")
+        FC=${AG}
+        ;;
+    "voron")
+        FC=${VR}
+        ;;
+    "mainsail")
+        FC=${MR}
+        ;;
+    "btt")
+        FC=${BR}
+        ;;
+    "klipper")
+        FC=${KR}
+        ;;
+    "fluidd")
+        FC=${FB}
+        ;;
+    "octoprint")
+        FC=${OG}
+        ;;
+    *)
+        FC=${CW}
+        ;;
+esac
+
+# Logic for switching variant colors. Theme agnostic
+case ${COLOR_VARIANT} in
+    1)
+        # variant 1 - accented labels
+        L=${FC} # label <- flavor color
+        B=${CG} # bullet
+        A=${FC} # arrow <- flavor color
+        V=${CW} # value
+        D=${CG} # description
+        ;;
+    2)
+        # variant 2 - accented values
+        L=${CW} # label
+        B=${CG} # bullet
+        A=${CW} # arrow
+        V=${FC} # value <- flavor color
+        D=${CG} # description
+        ;;
+    *)
+        # any other case (in case of error)
+        L=${CW} # label <- white
+        B=${CG} # bullet
+        A=${CW} # arrow <- white
+        V=${CW} # value <- white
+        D=${CG} # description
+        ;;
+esac
+
+# Logic for enabling / disabling OS updates highlighting. Theme and variant agnostic.
+if [ ${COLORED_UPDATES} ] && [ ${UPDATES_COUNT} -gt 0 ]; then
+    UV=${CX} # highlight color for value
+    UL=${CX} # highlight color for label
+else
+    UV=${V}  # variant dependent value color
+    UL=${D}  # variant dependent description color
+fi
+
+# END COLOR DEFINITION SECTION
+
+# get host information
+ETH_IP=`/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1`
+WLAN_IP=`/sbin/ip -o -4 addr list wlan0 | awk '{print $4}' | cut -d/ -f1`
+HOST_IP=""
+HOST_NAME=`hostname -s`
+# get load averages
+IFS=" " read LOAD1 LOAD5 LOAD15 <<<$(cat /proc/loadavg | awk '{ print $1,$2,$3 }')
+# get free memory
+IFS=" " read USED AVAIL TOTAL <<<$(free -htm | grep "Mem" | awk {'print $3,$7,$2'})
+# get processes
+PROCESS=`ps -eo user=|sort|uniq -c | awk '{ print $2 " " $1 }'`
+PROCESS_ALL=`echo "$PROCESS"| awk {'print $2'} | awk '{ SUM += $1} END { print SUM }'`
+PROCESS_ROOT=`echo "$PROCESS"| grep root | awk {'print $2'}`
+PROCESS_USER=`echo "$PROCESS"| grep -v root | awk {'print $2'} | awk '{ SUM += $1} END { print SUM }'`
+# get processors
+PROCESSOR_NAME=`grep "model name" /proc/cpuinfo | cut -d ' ' -f3- | awk {'print $0'} | head -1`
+PROCESSOR_COUNT=`grep -ioP 'processor\t:' /proc/cpuinfo | wc -l`
+# get disk usage
+ROOT_USAGE=`df -h / | awk '/\// {print $(NF-1)}' | sed 's/%//g'`
+ROOT_USAGE_GB=`df -h / | awk '/\// {print $(NF-3)}'`
+ROOT_TOTAL=`df -h / | awk '/\// {print $(NF-4)}'`
+# login info
+LASTLOG_DATETIME=`lastlog | awk '/pi/ {printf("%s-%s-%s, %s", $6, $5, $9, $7)}'`
+LASTLOG_IP=`lastlog | awk '/pi/ {print($3)}'`
+# available updates
+UPDATES_COUNT=`apt list --upgradable 2> /dev/null | grep -c upgradable`
+# cpu temp
+CPU_TEMP=`/usr/bin/vcgencmd measure_temp | cut -c "6-9"`
+
+STATUSES=""
+
+if [ -n "${CUSTOM_HEADER_TEXT}" ]; then
+    HEADER="${CUSTOM_HEADER_TEXT}"
+else
+    HEADER="${OS_FLAVOR}"
+fi
+
+for key in "${!SERVICES[@]}"; do
+    if [[ $(systemctl list-unit-files "${SERVICES[${key}]}*" | wc -l) -gt 3 ]]; then
+        status=$(systemctl show -p ActiveState --value "${SERVICES[${key}]}")
+        icon=""
+        if [ "$status" == "active" ]; then
+            icon="${SU}▲${CC}"
+        else
+            icon="${SD}▼${CC}"
+        fi
+        STATUSES+="  ${icon} ${SERVICES[${key}]}${CC}"
+      if [ $((( ${key} + 1 ) % ${SERVICES_COLUMNS})) -eq 0 ]; then
+           STATUSES+="\n"
+      fi
+    fi
+done
+STATUSES+="\n"
+SERVICES_OUT=`echo -e "${STATUSES}" | column -ts $',' | sed -e 's/^/  /'`
+
+if [ -n "$ETH_IP" ]; then
+  HOST_IP+="$V${ETH_IP}$D (lan)"
+fi
+
+if [ -n "$WLAN_IP" ]; then
+    if [ -n "$ETH_IP" ]; then
+      HOST_IP+="$D and "
+    fi
+  HOST_IP+="$V${WLAN_IP}$D (wifi)"
+fi
+
+MESSAGES="
+`figlet -w 50 "${HEADER}"`
+$L  Hostname$B....$A› $V`hostname`
+$L  IP addr$B.....$A› $HOST_IP
+$L  Distro$B......$A› $V`cat /etc/os-release | grep "PRETTY_NAME" | cut -d "=" -f 2- | sed 's/"//g'`
+$L  Kernel$B......$A› $V`uname -sr`
+$L  Uptime$B......$A› $V`uptime -p`
+
+$L  Load$B........$A› $V$LOAD1$D (1m), $V$LOAD5$D (5m), $V$LOAD15$D (15m)
+$L  Processes$B...$A› $V$PROCESS_ROOT$D (root), $V$PROCESS_USER$D (user), $V$PROCESS_ALL$D (total)
+$L  CPU$B.........$A› $V$PROCESSOR_COUNT$D vCPU
+$L  Memory$B......$A› $V$USED$D used, $V$AVAIL$D avail, $V$TOTAL$D total
+$L  Disk$B........$A› $V$ROOT_USAGE%$D ($ROOT_USAGE_GB of $ROOT_TOTAL)
+$L  Temp$B........$A› $V$CPU_TEMP$DºC
+
+$L  Updates$B.....$A› $UV$UPDATES_COUNT$UL available
+$L  Last login$B..$A› $V$LASTLOG_DATETIME$D from $V$LASTLOG_IP
+
+$L  Services\n $STATUSES
+"
+
+paste ./logos/"${OS_FLAVOR}" <( echo -e "${MESSAGES}")

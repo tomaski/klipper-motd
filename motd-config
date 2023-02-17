@@ -1,0 +1,150 @@
+#!/bin/bash
+
+# are we running with elevated permissions?
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root." 
+   exit 1
+fi
+
+WT_HEIGHT=18
+WT_WIDTH=120
+WT_MENU_HEIGHT=$(($WT_HEIGHT-7))
+
+
+do_flavor_menu(){
+   FUN=$(whiptail --title "Klipper Message of The Day Configuration Tool (motd-config)" --menu "Theme choice" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+      "F1 Annex" "Choose Annex Engineering theme" \
+      "F2 BTT" "Choose Big Tree Tech theme" \
+      "F3 Fluidd" "Choose Fluidd theme" \
+      "F4 Klipper" "Choose Klipper theme (default)" \
+      "F5 MainsailOS" "Choose MainsailOS theme" \
+      "F6 Octoprint" "Choose Octoprint theme" \
+      "F7 RatOS" "Choose RatOS theme" \
+      "F8 Voron" "Choose Voron Design theme" \
+      3>&1 1>&2 2>&3)
+   RET=$?
+   if [ $RET -eq 1 ]; then
+      return 0
+   elif [ $RET -eq 0 ]; then
+      case "$FUN" in
+         F1\ *) set_config OS_FLAVOR \"annex\" ;;
+         F2\ *) set_config OS_FLAVOR \"btt\" ;;
+         F3\ *) set_config OS_FLAVOR \"fluidd\" ;;
+         F4\ *) set_config OS_FLAVOR \"klipper\" ;;
+         F5\ *) set_config OS_FLAVOR \"mainsail\" ;;
+         F6\ *) set_config OS_FLAVOR \"octoprint\" ;;
+         F7\ *) set_config OS_FLAVOR \"ratos\" ;;
+         F8\ *) set_config OS_FLAVOR \"voron\" ;;
+         *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
+      esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+   fi
+}
+
+do_variant_menu(){
+   FUN=$(whiptail --title "Klipper Message of The Day Configuration Tool (motd-config)" --menu "Color variant" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+      "V1 Labels" "Theme accent color will be set on labels" \
+      "V2 Values" "Theme accent color will be set on values (default)" \
+      3>&1 1>&2 2>&3)
+   RET=$?
+   if [ $RET -eq 1 ]; then
+      return 0
+   elif [ $RET -eq 0 ]; then
+      case "$FUN" in
+         V1\ *) set_config COLOR_VARIANT 1 ;;
+         V2\ *) set_config COLOR_VARIANT 2 ;;
+         *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
+      esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+   fi
+}
+
+do_updates(){
+   DEFAULT=--defaultno
+   whiptail --yesno "Would you like the OS updates to be highlighted?" $DEFAULT 20 60 2
+   RET=$?
+   if [ $RET -eq 0 ]; then
+      sed -i '/COLORED_UPDATES=/cCOLORED_UPDATES=true' /etc/update-motd.d/10-klipper-motd
+      STATUS=enabled
+   elif [ $RET -eq 1 ]; then
+      sed -i '/COLORED_UPDATES=/cCOLORED_UPDATES=false' /etc/update-motd.d/10-klipper-motd
+      STATUS=disabled
+   else
+      return $RET
+   fi
+   whiptail --msgbox "The OS updates highlighting is $STATUS" 20 60 1
+}
+
+
+do_columns_menu(){
+   FUN=$(whiptail --title "Klipper Message of The Day Configuration Tool (motd-config)" --menu "Services columns" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+      "C1 Two Columns" "Status of the services will be divided into 2 columns." \
+      "C2 Three Columns" "Status of the services will be divided into 3 columns." \
+      "C3 Four Columns" "Status of the services will be divided into 4 columns." \
+      3>&1 1>&2 2>&3)
+   RET=$?
+   if [ $RET -eq 1 ]; then
+      return 0
+   elif [ $RET -eq 0 ]; then
+      case "$FUN" in
+         C1\ *) set_config SERVICES_COLUMNS 2 ;;
+         C2\ *) set_config SERVICES_COLUMNS 3 ;;
+         C3\ *) set_config SERVICES_COLUMNS 4 ;;
+         *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
+      esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+   fi
+}
+
+do_header(){
+   whiptail --msgbox "\
+Please note: The header may not contain diacritic characters \
+and quotes. Other characters are supported, but only digits, \
+slashes, hyphens, underscores, punctuations and spaces \
+are recommended due to redability. \
+\n
+Also: athough the length of input is not limited \
+it is strongly recommended to not exceed 8-9 characters 
+(8 if using one capital letter, 9 if all letters lowercase)
+as it WILL break the layout. \
+" 20 70 1
+
+   CURRENT_HEADER=$(get_custom_header)
+   NEW_HEADER=$(whiptail --inputbox "Please enter a header" 20 60 "$CURRENT_HEADER" 3>&1 1>&2 2>&3)
+
+   if [ "$?" -eq 0 ]; then
+      set_config CUSTOM_HEADER_TEXT \""${NEW_HEADER}"\"
+   fi
+}
+
+set_config(){
+   sed -i "/${1}=/c${1}=${2}" /etc/update-motd.d/10-klipper-motd
+}
+
+get_custom_header(){
+   HEADER=$(grep CUSTOM_HEADER_TEXT= /etc/update-motd.d/10-klipper-motd | cut -d = -f 2 | tr -d '"')
+   echo "${HEADER}"
+}
+
+while true; do
+   FUN=$(whiptail --title "Klipper Message of The Day Configuration Tool (motd-config)" --menu "MoTD Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+      "1 OS Flavor" "Choose which logo and colors to display" \
+      "2 Color Variant" "Select whether labels or values are colored" \
+      "3 Colored Updates" "Enable/disable colored OS updates count" \
+      "4 Services Columns" "Set number columns services are divided into" \
+      "5 Custom Header" "Set name to be displayed on top of sysinfo" \
+      3>&1 1>&2 2>&3)
+   RET=$?
+   if [ $RET -eq 1 ]; then
+      exit 0
+   elif [ $RET -eq 0 ]; then
+      case "$FUN" in
+         1\ *) do_flavor_menu ;;
+         2\ *) do_variant_menu ;;
+         3\ *) do_updates ;;
+         4\ *) do_columns_menu ;;
+         5\ *) do_header ;;
+         *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
+      esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+   else
+      exit 1
+   fi
+
+done
