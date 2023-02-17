@@ -70,7 +70,7 @@ install_motd(){
     fi
 
     chmod +x $SCRIPT_DIR/motd-config
-    cp motd-config /usr/bin/motd-config
+    cp $SCRIPT_DIR/motd-config /usr/bin/motd-config
     echo "> Installed the MoTD configurator."
 }
 
@@ -128,7 +128,7 @@ while [ $# -gt 0 ]; do
             echo -e "\nKlipper MoTD has been succesfully installed.\n\nRun 'sudo motd-config' to set it up."
             shift
             ;;
-        -u | --uninstall)
+        -r | --remove)
             backup_sshd_config
             uninstall_motd
             reload_sshd
