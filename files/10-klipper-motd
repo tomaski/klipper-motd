@@ -90,15 +90,6 @@ case ${COLOR_VARIANT} in
         ;;
 esac
 
-# Logic for enabling / disabling OS updates highlighting. Theme and variant agnostic.
-if [ ${COLORED_UPDATES} ] && [ ${UPDATES_COUNT} -gt 0 ]; then
-    UV=${CX} # highlight color for value
-    UL=${CX} # highlight color for label
-else
-    UV=${V}  # variant dependent value color
-    UL=${D}  # variant dependent description color
-fi
-
 # END COLOR DEFINITION SECTION
 
 # get host information
@@ -132,12 +123,23 @@ CPU_TEMP=`/usr/bin/vcgencmd measure_temp | cut -c "6-9"`
 
 STATUSES=""
 
+# Logic for enabling / disabling OS updates highlighting. Theme and variant agnostic.
+if [ ${COLORED_UPDATES} ] && [ ${UPDATES_COUNT} -gt 0 ]; then
+    UV=${CX} # highlight color for value
+    UL=${CX} # highlight color for label
+else
+    UV=${V}  # variant dependent value color
+    UL=${D}  # variant dependent description color
+fi
+
+# if custom header empty, use default, else use the custom one
 if [ -n "${CUSTOM_HEADER_TEXT}" ]; then
     HEADER="${CUSTOM_HEADER_TEXT}"
 else
     HEADER="${OS_FLAVOR}"
 fi
 
+# loop through services list and set color for their status icon
 for key in "${!SERVICES[@]}"; do
     if [[ $(systemctl list-unit-files "${SERVICES[${key}]}*" | wc -l) -gt 3 ]]; then
         status=$(systemctl show -p ActiveState --value "${SERVICES[${key}]}")
@@ -188,4 +190,4 @@ $L  Last login$B..$A› $V$LASTLOG_DATETIME$D from $V$LASTLOG_IP
 $L  Services\n $STATUSES
 "
 
-paste ./logos/"${OS_FLAVOR}" <( echo -e "${MESSAGES}")
+paste /etc/update-motd.d/logos/"${OS_FLAVOR}" <( echo -e "${MESSAGES}")

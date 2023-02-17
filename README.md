@@ -68,7 +68,7 @@ Turned off
 Will always use the `variant` settings.
 
 ### Removal
-If you no longer wish to use this MoTD simply run `setup.sh` command with `--uninstall` flag and the script will remove all `klipper-motd` files from your system and revert any changes made during installation.
+If you no longer wish to use this MoTD simply run `setup.sh` command with `--remove` flag and the script will remove all `klipper-motd` files from your system and revert any changes made during installation.
 ```bash
 sudo ./klipper-motd/setup.sh --remove
 ```
