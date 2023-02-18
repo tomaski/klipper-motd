@@ -27,14 +27,14 @@ do_flavor_menu(){
       return 0
    elif [ $RET -eq 0 ]; then
       case "$FUN" in
-         F1\ *) set_config OS_FLAVOR \"annex\" ;;
-         F2\ *) set_config OS_FLAVOR \"btt\" ;;
-         F3\ *) set_config OS_FLAVOR \"fluidd\" ;;
-         F4\ *) set_config OS_FLAVOR \"klipper\" ;;
-         F5\ *) set_config OS_FLAVOR \"mainsail\" ;;
-         F6\ *) set_config OS_FLAVOR \"octoprint\" ;;
-         F7\ *) set_config OS_FLAVOR \"ratos\" ;;
-         F8\ *) set_config OS_FLAVOR \"voron\" ;;
+         F1\ *) set_config OS_FLAVOR \'annex\' ;;
+         F2\ *) set_config OS_FLAVOR \'btt\' ;;
+         F3\ *) set_config OS_FLAVOR \'fluidd\' ;;
+         F4\ *) set_config OS_FLAVOR \'klipper\' ;;
+         F5\ *) set_config OS_FLAVOR \'mainsail\' ;;
+         F6\ *) set_config OS_FLAVOR \'octoprint\' ;;
+         F7\ *) set_config OS_FLAVOR \'ratos\' ;;
+         F8\ *) set_config OS_FLAVOR \'voron\' ;;
          *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
       esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
    fi
@@ -95,10 +95,9 @@ do_columns_menu(){
 
 do_header(){
    whiptail --msgbox "\
-Please note: The header may not contain diacritic characters \
-and quotes. Other characters are supported, but only digits, \
-slashes, hyphens, underscores, punctuations and spaces \
-are recommended due to redability. \
+Please note: The header may not contain diacritic characters. \
+Other characters are supported, but most of the special ones \
+are not recommended due to poor redability after conversion. \
 \n
 Also: athough the length of input is not limited \
 it is strongly recommended to not exceed 8-9 characters 
@@ -108,9 +107,10 @@ as it WILL break the layout. \
 
    CURRENT_HEADER=$(get_custom_header)
    NEW_HEADER=$(whiptail --inputbox "Please enter a header" 20 60 "$CURRENT_HEADER" 3>&1 1>&2 2>&3)
+   ESCAPED_HEADER=$(echo "${NEW_HEADER}" | sed "s;';\`;g")
 
    if [ "$?" -eq 0 ]; then
-      set_config CUSTOM_HEADER_TEXT \""${NEW_HEADER}"\"
+      set_config CUSTOM_HEADER_TEXT "${ESCAPED_HEADER@Q}"
    fi
 }
 
@@ -119,7 +119,7 @@ set_config(){
 }
 
 get_custom_header(){
-   HEADER=$(grep CUSTOM_HEADER_TEXT= /etc/update-motd.d/10-klipper-motd | cut -d = -f 2 | tr -d '"')
+   HEADER=$(grep CUSTOM_HEADER_TEXT= /etc/update-motd.d/10-klipper-motd | cut -d = -f 2 | sed "s/'//g")
    echo "${HEADER}"
 }
 

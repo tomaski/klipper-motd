@@ -1,11 +1,11 @@
 #!/bin/bash
 
-OS_FLAVOR="klipper"
-CUSTOM_HEADER_TEXT=""
+OS_FLAVOR='klipper'
+CUSTOM_HEADER_TEXT=''
 COLOR_VARIANT=2
 COLORED_UPDATES=true
 SERVICES=("klipper" "moonraker" "crowsnest" "KlipperScreen")
-SERVICES_COLUMNS=2
+SERVICES_COLUMNS=4
 
 # START COLOR DEFINITION SECTION
 # below are all colors used in this script
