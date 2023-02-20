@@ -23,6 +23,12 @@ As I SSH into my printers quite frequently, I got bored with the standard, gener
 
 ## The How (a.k.a. Getting Started)
 
+### Preparation
+`klipper-motd` requires that your shell window is at least 120 columns wide. Some clients will autoadjust when resizing the window and some won't. One of those programs is PuTTY.
+The columns width can be adjusted in PuTTY settings
+
+![PuTTY columns](putty.png)
+
 ### Installation
 
 First, SSH into your Raspberry and download this reposiitory
