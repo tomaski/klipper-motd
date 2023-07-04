@@ -146,9 +146,6 @@ cat converted_image
 ```
 If the size is wrong, you need to adjust the `--magnified` parameter. For images that are 1024px x 1024px the magnification of about `20` is good starting point. Smaller image sizes need lower magnification value.
 
-## Want to contribute?
-Contributions are always welcome! Please have a look at the awesome tutorial [How to Contribute to an Open Source Project on GitHub](https://kcd.im/pull-request)
-
 ### Q: How to display the MoTD at-will?
 It is possible to output the MoTD contents at any time and not only on login. To do that, use following command
 ```bash
@@ -170,6 +167,9 @@ source ~/.bashrc
 ```
 
 Now everytime you run `klipper-motd` command, the MoTD will be displayed in the shell.
+
+## Want to contribute?
+Contributions are always welcome! Please have a look at the awesome tutorial [How to Contribute to an Open Source Project on GitHub](https://kcd.im/pull-request)
 
 ## Credits
 `klipper-motd` is heavily inspired by [Street Fighter MOTD](https://github.com/ajgon/street-fighter-motd) by Igor Rzegocki for its picture section and [Fancy MOTD](https://github.com/bcyran/fancy-motd) by Bazyli Cyran for the sysinfo section.
