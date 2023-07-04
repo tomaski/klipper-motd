@@ -117,7 +117,7 @@ SERVICES=("klipper" "moonraker" "crowsnest" "KlipperScreen")
 ### Q: How to edit colors?
 Editing colors is also not supported in configurator, so in order to tweak the theme to your liking, you'd need to make manual edits
 ```bash
-sudo nano /etc/motd.update.d/10-klipper-motd
+sudo nano /etc/update-motd.d/10-klipper-motd
 ```
 the color definitions used, are clearly described inside this file. This link might come in handy for color codes [bash colors cheat sheet](https://www.ditig.com/256-colors-cheat-sheet)
 
