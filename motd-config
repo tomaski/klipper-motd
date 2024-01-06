@@ -21,6 +21,7 @@ do_flavor_menu(){
       "F6 Octoprint" "Choose Octoprint theme" \
       "F7 RatOS" "Choose RatOS theme" \
       "F8 Voron" "Choose Voron Design theme" \
+      "F9 FYSETC" "Choose FYSETC theme" \
       3>&1 1>&2 2>&3)
    RET=$?
    if [ $RET -eq 1 ]; then
@@ -35,6 +36,7 @@ do_flavor_menu(){
          F6\ *) set_config OS_FLAVOR \'octoprint\' ;;
          F7\ *) set_config OS_FLAVOR \'ratos\' ;;
          F8\ *) set_config OS_FLAVOR \'voron\' ;;
+         F9\ *) set_config OS_FLAVOR \'fysetc\' ;;
          *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
       esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
    fi

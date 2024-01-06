@@ -19,6 +19,7 @@ BR="\e[38;5;124m"  # btt red
 KR="\e[38;5;131m"  # klipper red
 FB="\e[38;5;33m"   # fluidd blue
 OG="\e[38;5;34m"   # octoprint green
+FR="\e[38;2;255;0;0m"   # fysetc red
 
 # define standard colors for rest of the text
 CW="\e[38;5;255m"  # color white
@@ -56,6 +57,9 @@ case ${OS_FLAVOR} in
         ;;
     "octoprint")
         FC=${OG}
+        ;;
+    "fysetc")
+        FC=${FR}
         ;;
     *)
         FC=${CW}
