@@ -19,6 +19,8 @@ BR="\e[38;5;124m"  # btt red
 KR="\e[38;5;131m"  # klipper red
 FB="\e[38;5;33m"   # fluidd blue
 OG="\e[38;5;34m"   # octoprint green
+PB="\e[38;5;39m"   # Pine64 blue
+OP="\e[38;5;214m"  # orangepi orange
 
 # define standard colors for rest of the text
 CW="\e[38;5;255m"  # color white
@@ -57,6 +59,18 @@ case ${OS_FLAVOR} in
     "octoprint")
         FC=${OG}
         ;;
+    "radxa")
+        FC=${RG}
+        ;;
+    "radxa")
+        FC=${RG}
+        ;;
+    "pine64")
+        FC=${PB}
+        ;;
+    "orangepi")
+        FC=${OP}
+        ;;
     *)
         FC=${CW}
         ;;
@@ -93,8 +107,8 @@ esac
 # END COLOR DEFINITION SECTION
 
 # get host information
-ETH_IP=`/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1`
-WLAN_IP=`/sbin/ip -o -4 addr list wlan0 | awk '{print $4}' | cut -d/ -f1`
+ETH_IP=`ip -br addr show | awk '$1 ~ /e/ {print $3}'`
+WLAN_IP=`ip -br addr show | awk '$1 ~ /w/ {print $3}'`
 HOST_IP=""
 HOST_NAME=`hostname -s`
 # get load averages
@@ -119,7 +133,11 @@ LASTLOG_IP=`lastlog | awk '/pi/ {print($3)}'`
 # available updates
 UPDATES_COUNT=`apt list --upgradable 2> /dev/null | grep -c upgradable`
 # cpu temp
-CPU_TEMP=`/usr/bin/vcgencmd measure_temp | cut -c "6-9"`
+if test -f /etc/armbian-release; then
+    CPU_TEMP=`cat /etc/armbianmonitor/datasources/soctemp | awk '{printf("%d",$1/1000)}'`
+else
+    CPU_TEMP=`/usr/bin/vcgencmd measure_temp | cut -c "6-9"`
+fi
 
 STATUSES=""
 
@@ -173,7 +191,7 @@ MESSAGES="
 `figlet -w 50 "${HEADER}"`
 $L  Hostname$B....$A› $V`hostname`
 $L  IP addr$B.....$A› $HOST_IP
-$L  Distro$B......$A› $V`cat /etc/os-release | grep "PRETTY_NAME" | cut -d "=" -f 2- | sed 's/"//g'`
+$L  Distro$B......$A› $V`cat /etc/os-release | grep "^PRETTY_NAME" | cut -d "=" -f 2- | sed 's/"//g'`
 $L  Kernel$B......$A› $V`uname -sr`
 $L  Uptime$B......$A› $V`uptime -p`
 
