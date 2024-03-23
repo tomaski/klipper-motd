@@ -36,9 +36,13 @@ First, SSH into your Raspberry and download this reposiitory
 git clone https://www.github.com/tomaski/klipper-motd.git
 ```
 
-Installation is done by making the `setup.sh` executable and running it with proper flag
+Make the `setup.sh` executable 
 ```bash
 chmod +x ./klipper-motd/setup.sh
+```
+
+and run it with proper flag
+```bash
 sudo ./klipper-motd/setup.sh --install
 ```
 
@@ -92,6 +96,13 @@ after that, remove the `klipper-motd` directory
 ```bash
 rm -rf ./klipper-motd/
 ```
+
+### Update
+To check for updates just run 
+```bash
+sudo ./klipper-motd/setup.sh --update
+```
+If update is available you will be asked if you want to install it.
 
 ## FAQ
 ### Q: Why are the logos so blurry/pixelated?
