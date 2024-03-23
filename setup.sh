@@ -16,7 +16,7 @@ get_help(){
 
     Usage: setup.sh [OPTIONS]
 
-        Easily install/uninstall Klipper-MoTD.
+        Easily install/update/remove Klipper-MoTD.
 
         Written by Tomasz Paluszkiewicz (GitHub: tomaski)
 
@@ -28,6 +28,10 @@ get_help(){
         -r, --remove
             The MoTD files will be removed from the system,
             and all changes reverted.
+
+        -u, --update
+            Check for updates. If newer version is found,
+            you'll be asked whether to update or not. 
 
         -h, --help
             Display this help text and exit. No changes are made.
@@ -108,6 +112,34 @@ uninstall_motd(){
     echo "> Deleted the MoTD configurator."
 }
 
+check_update_motd(){
+
+    git remote update
+    CURRENT_VERSION=`git describe --tags --abbrev=0 --match "*.*.*" main`
+    LAST_VERSION=`git describe --tags --abbrev=0 --match "*.*.*" origin/main`
+
+    if [ $CURRENT_VERSION != $LAST_VERSION ]; then
+        echo "New version $LAST_VERSION available. You are on $CURRENT_VERSION"
+        while true; do
+            read -r -n 1 -p "Do you wish to update [y/n]? " run_update
+            case $run_update in
+                [Yy] ) run_update_motd(); break;;
+                [Nn] ) exit;;
+                * ) echo "Please answer yes or no.";;
+            esac
+        done   
+    else
+        echo "You are already on the latest version ($CURRENT_VERSION)."
+    fi
+}
+
+run_update_motd(){
+    git pull --no-edit
+    cp -r $SCRIPT_DIR/files/* /etc/update-motd.d/
+    chmod +x /etc/update-motd.d/10-klipper-motd
+    echo -e "\nKlipper MoTD has been succesfully updated.\n\nRun 'sudo motd-config' to set it up."
+}
+
 reload_sshd(){
     systemctl reload sshd.service
     echo "> Reloaded sshd.service"
@@ -133,6 +165,10 @@ while [ $# -gt 0 ]; do
             uninstall_motd
             reload_sshd
             echo -e "\nKlipper MoTD has been succesfully removed."
+            shift
+            ;;
+        -u | --update)
+            check_update_motd
             shift
             ;;
         -h | --help)
