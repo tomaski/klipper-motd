@@ -146,6 +146,28 @@ cat converted_image
 ```
 If the size is wrong, you need to adjust the `--magnified` parameter. For images that are 1024px x 1024px the magnification of about `20` is good starting point. Smaller image sizes need lower magnification value.
 
+### Q: How to display the MoTD at-will?
+It is possible to output the MoTD contents at any time and not only on login. To do that, use following command
+```bash
+sudo run-parts /etc/update-motd.d
+```
+If you think you'll be using it more frequently, you can register a custom command for it:
+> **Warning**
+> Following commands apply only to the standard terminal shell. If you're using something else, like ZSH for example then you need to make changes to the corresponding configuration files for that shell.
+```bash
+nano ~/.bash_aliases
+```
+then write following content to that file
+```bash
+alias klipper-motd='run-parts /etc/update-motd.d/'
+```
+then just save that file: `Ctrl`+`o` to save. Then `Enter` to confirm and `Ctrl`+`x` to exit. After that, reload terminal settings:
+```bash
+source ~/.bashrc
+```
+
+Now everytime you run `klipper-motd` command, the MoTD will be displayed in the shell.
+
 ## Want to contribute?
 Contributions are always welcome! Please have a look at the awesome tutorial [How to Contribute to an Open Source Project on GitHub](https://kcd.im/pull-request)
 
