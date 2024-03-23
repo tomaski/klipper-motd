@@ -60,6 +60,7 @@ Currently supported "flavors":
 - OctoPrint
 - RatOS
 - Voron
+- Fysetc
 
 #### Available variants
 Variant  1 (labels)
