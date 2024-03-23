@@ -122,29 +122,38 @@ sudo nano /etc/update-motd.d/10-klipper-motd
 the color definitions used, are clearly described inside this file. This link might come in handy for color codes [bash colors cheat sheet](https://www.ditig.com/256-colors-cheat-sheet)
 
 ### Q: How to add more logos?
-First of all, you need [util-say](https://github.com/maandree/util-say) which needs OpenJDK (as util-say is Java based) version 6 and 7 - but Raspberry OS based system nowadays come with versions 11 and 17. So you'd either need older Linux distribution (Ubuntu 18.04 is confirmed to be working) or find a way to install v6 (I won't be covering it). Then it's matter of installing needed packages
+First of all, you need [util-say](https://github.com/maandree/util-say) which needs OpenJDK (as util-say is Java based), Perl, coreutils and texinfo. 
+So first, install the needed packages
 ```bash
-sudo apt-get install imagemagick openjdk-6-jdk coreutils perl
+sudo apt-get install imagemagick openjdk-17-jdk coreutils perl texinfo
 ```
-and downloading the `util-say`
+then download the `util-say`
 ```bash
 git clone https://github.com/maandree/util-say
 cd util-say
 make
 ```
-then just download your image
+after that you can download your image
 ```bash
 wget URL_OF_YOUR_PICTURE -O myimage.png
 ```
-and convert it to text-based representation
+and convert it to text-based representation.
 ```bash
 ./ponytool --import image --magnified 20 --file myimage.png --balloon n --export ponysay --platform xterm --chroma 1 --right 0 --left 0 --top 0 --bottom 0 > converted_image
 ```
-the text-based image will be saved to `converted_image` file. To view it, simply type
+The text-based image will be saved to `converted_image` file. To view it, simply type
 ```bash
 cat converted_image
 ```
 If the size is wrong, you need to adjust the `--magnified` parameter. For images that are 1024px x 1024px the magnification of about `20` is good starting point. Smaller image sizes need lower magnification value.
+
+The recommended image height is 27-28 lines/rows. To quickly check how many lines the image consists of, run this command:
+```bash
+cat out/converted_image | wc -l
+```
+
+If the created image is almost the recommended size, but tiny bit too short, play with the padding settings `--top 0 --bottom 0` of the `ponytool` command above.
+
 
 ### Q: How to display the MoTD at-will?
 It is possible to output the MoTD contents at any time and not only on login. To do that, use following command
@@ -157,7 +166,7 @@ If you think you'll be using it more frequently, you can register a custom comma
 ```bash
 nano ~/.bash_aliases
 ```
-then write following content to that file
+then write following content to that file (you can replace `klipper-motd` with your own name)
 ```bash
 alias klipper-motd='run-parts /etc/update-motd.d/'
 ```
