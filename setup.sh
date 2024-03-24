@@ -123,7 +123,7 @@ check_update_motd(){
         while true; do
             read -r -n 1 -p "Do you wish to update [y/n]? " run_update
             case $run_update in
-                [Yy] ) run_update_motd(); break;;
+                [Yy] ) run_update_motd; break;;
                 [Nn] ) exit;;
                 * ) echo "Please answer yes or no.";;
             esac
