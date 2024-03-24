@@ -28,9 +28,9 @@ do_flavor_menu(){
       "F7 RatOS" "Choose RatOS theme" \
       "F8 Voron" "Choose Voron Design theme" \
       "F9 FYSETC" "Choose FYSETC theme" \
-      "F10 Radxa" "Choose Radxa Design theme" \
-      "F11 Pine64" "Choose Pine64 Design theme" \
-      "F12 OrangePi" "Choose OrangePi Design theme" \
+      "F10 Radxa" "Choose Radxa theme" \
+      "F11 Pine64" "Choose Pine64 theme" \
+      "F12 OrangePi" "Choose OrangePi theme" \
       3>&1 1>&2 2>&3)
    RET=$?
    if [ $RET -eq 1 ]; then

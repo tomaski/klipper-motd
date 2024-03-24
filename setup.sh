@@ -134,10 +134,14 @@ check_update_motd(){
 }
 
 run_update_motd(){
-    git pull --no-edit
-    cp -r $SCRIPT_DIR/files/* /etc/update-motd.d/
-    chmod +x /etc/update-motd.d/10-klipper-motd
-    echo -e "\nKlipper MoTD has been succesfully updated.\n\nRun 'sudo motd-config' to set it up."
+    if [ -f /etc/update-motd.d/10-klipper-motd ]; then
+        git pull --no-edit
+        cp -r $SCRIPT_DIR/files/* /etc/update-motd.d/
+        chmod +x /etc/update-motd.d/10-klipper-motd
+        echo -e "\nKlipper MoTD has been succesfully updated.\n\nRun 'sudo motd-config' to set it up."
+    else
+        echo "Klipper MoTD does not seem to be installed!"
+    fi
 }
 
 reload_sshd(){

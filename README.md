@@ -65,6 +65,9 @@ Currently supported "flavors":
 - RatOS
 - Voron
 - Fysetc
+- Radxa
+- Pine64
+- OrangePi
 
 #### Available variants
 Variant  1 (labels)
