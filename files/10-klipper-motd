@@ -104,8 +104,8 @@ esac
 # END COLOR DEFINITION SECTION
 
 # get host information
-ETH_IP=`ip -br addr show | awk '$1 ~ /e/ {print $3}'`
-WLAN_IP=`ip -br addr show | awk '$1 ~ /w/ {print $3}'`
+ETH_IP=`/sbin/ip -br addr show | awk '$1 ~ /^[e]/ && $3 != "" {result = result $3 " " } END{ print result}'`
+WLAN_IP=`/sbin/ip -br addr show | awk '$1 ~ /^[w]/ && $3 != "" {result = result $3 " " } END{ print result}'`
 HOST_IP=""
 HOST_NAME=`hostname -s`
 # get load averages
@@ -174,14 +174,14 @@ STATUSES+="\n"
 SERVICES_OUT=`echo -e "${STATUSES}" | column -ts $',' | sed -e 's/^/  /'`
 
 if [ -n "$ETH_IP" ]; then
-  HOST_IP+="$V${ETH_IP}$D (lan)"
+  HOST_IP+="$V${ETH_IP}$D(lan)"
 fi
 
 if [ -n "$WLAN_IP" ]; then
     if [ -n "$ETH_IP" ]; then
       HOST_IP+="$D and "
     fi
-  HOST_IP+="$V${WLAN_IP}$D (wifi)"
+  HOST_IP+="$V${WLAN_IP}$D(wifi)"
 fi
 
 MESSAGES="
