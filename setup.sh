@@ -177,14 +177,10 @@ while [ $# -gt 0 ]; do
             ;;
         -h | --help)
             get_help
-            # exit 0
-            ;;
-        --)
-            shift
-            break
+            exit 0
             ;;
         *)
-            echo -e "\nUnknown option ${1}. Type 'sudo ./"$(basename "$0")" --help' for usage info.\n"
+            echo -e "\nUnknown option '${1}'. Type 'sudo ./"$(basename "$0")" --help' for usage info.\n"
             exit 1
             ;;
     esac
