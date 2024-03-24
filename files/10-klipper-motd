@@ -62,9 +62,6 @@ case ${OS_FLAVOR} in
     "radxa")
         FC=${RG}
         ;;
-    "radxa")
-        FC=${RG}
-        ;;
     "pine64")
         FC=${PB}
         ;;
