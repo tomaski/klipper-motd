@@ -22,6 +22,7 @@ OG="\e[38;5;34m"   # octoprint green
 FR="\e[38;2;255;0;0m"   # fysetc red
 PB="\e[38;5;39m"   # Pine64 blue
 OP="\e[38;5;214m"  # orangepi orange
+ZR="\e[38;5;196m"  # vzbot red
 
 # define standard colors for rest of the text
 CW="\e[38;5;255m"  # color white
@@ -71,6 +72,9 @@ case ${OS_FLAVOR} in
         ;;
     "orangepi")
         FC=${OP}
+        ;;
+    "vzbot")
+        FC=${ZR}
         ;;
     *)
         FC=${CW}

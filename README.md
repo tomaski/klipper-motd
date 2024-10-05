@@ -68,6 +68,7 @@ Currently supported "flavors":
 - Radxa
 - Pine64
 - OrangePi
+- VzBot
 
 #### Available variants
 Variant  1 (labels)
