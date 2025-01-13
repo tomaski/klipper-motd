@@ -119,7 +119,7 @@ Currently, the configurator does not support editing services list, so if you wi
 > service names are case sensitive! 
 > Run `systemctl list-units --type=service` to see which services are known to the system and what their names are. You need to use that name (without `.service`)
 ```bash
-sudo nano /etc/motd.update.d/10-klipper-motd
+sudo nano /etc/update-motd.d/10-klipper-motd
 ```
 
 The services to be displayed are stored here
