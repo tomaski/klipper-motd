@@ -1,0 +1,9 @@
+
+### BEGIN KLIPPER-MOTD CONFIG
+[update_manager klipper-motd]
+type: git_repo
+primary_branch: main
+origin: https://www.github.com/tomaski/klipper-motd.git
+path: ~/klipper-motd
+is_system_service: False
+### END KLIPPER-MOTD CONFIG
