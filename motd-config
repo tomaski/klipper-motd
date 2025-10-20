@@ -32,6 +32,7 @@ do_flavor_menu(){
       "F11 Pine64" "Choose Pine64 theme" \
       "F12 OrangePi" "Choose OrangePi theme" \
       "F13 VzBot" "Choose VzBot theme" \
+      "F14 QiDi" "Choose QiDi theme" \
       3>&1 1>&2 2>&3)
    RET=$?
    if [ $RET -eq 1 ]; then
@@ -51,6 +52,7 @@ do_flavor_menu(){
          F11\ *) set_config OS_FLAVOR \'pine64\' ;;
          F12\ *) set_config OS_FLAVOR \'orangepi\' ;;
          F13\ *) set_config OS_FLAVOR \'vzbot\' ;;
+         F14\ *) set_config OS_FLAVOR \'qidi\' ;;
          *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
       esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
    fi
