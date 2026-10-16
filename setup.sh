@@ -97,10 +97,20 @@ install_motd(){
     echo "> Copied the klipper MoTD files."
 
     # Install dependencies
-    if ! [ -x "$(command -v figlet)" ]; then
-        apt-get update > /dev/null 2>&1
-        apt-get install -y figlet > /dev/null 2>&1
+    if ! command -v figlet >/dev/null 2>&1 || ! command -v last >/dev/null 2>&1; then
+        apt-get update > /dev/null
+    fi
+    if ! command -v figlet >/dev/null 2>&1; then
+        apt-get install -y figlet > /dev/null
         echo "> Installed necessary 'figlet' package."
+    fi
+    if ! command -v last >/dev/null 2>&1; then
+        if apt-cache show wtmpdb 2>/dev/null | grep -q '^Package: wtmpdb$'; then
+            apt-get install -y wtmpdb > /dev/null
+            echo "> Installed 'wtmpdb' to provide the 'last' command."
+        else
+            echo "> 'last' is unavailable and 'wtmpdb' is not in the package sources; last-login details may be unavailable."
+        fi
     fi
 
     # Install configurator
