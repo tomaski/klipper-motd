@@ -141,15 +141,35 @@ ROOT_USAGE=`df -h / | awk '/\// {print $(NF-1)}' | sed 's/%//g'`
 ROOT_USAGE_GB=`df -h / | awk '/\// {print $(NF-3)}'`
 ROOT_TOTAL=`df -h / | awk '/\// {print $(NF-4)}'`
 # login info
-LASTLOG_DATETIME=`lastlog | awk '/pi/ {printf("%s-%s-%s, %s", $6, $5, $9, $7)}'`
-LASTLOG_IP=`lastlog | awk '/pi/ {print($3)}'`
+LOGIN_USER=${PAM_USER:-${LOGNAME:-${USER:-$(id -un)}}}
+LASTLOG_DATETIME=unavailable
+LASTLOG_IP=-
+LASTLOG_INFO=$(last -F -w 2>/dev/null | awk -v user="$LOGIN_USER" '
+    $1 == user { login = $0; exit }
+    user == "root" && !fallback && $1 !~ /^(wtmp|reboot|shutdown|runlevel)$/ { fallback = $0 }
+    END {
+        if (!login) login = fallback
+        if (login) {
+            split(login, fields)
+            for (i = 4; i <= 8; i++) date = date (i == 4 ? "" : " ") fields[i]
+            print date "\t" (fields[3] == "" ? "-" : fields[3])
+        }
+    }
+')
+if [ -n "$LASTLOG_INFO" ]; then
+    IFS=$'\t' read -r LASTLOG_DATETIME LASTLOG_IP <<< "$LASTLOG_INFO"
+fi
 # available updates
 UPDATES_COUNT=`apt list --upgradable 2> /dev/null | grep -c upgradable`
-# cpu temp
-if test -f /etc/armbian-release; then
-    CPU_TEMP=`cat /etc/armbianmonitor/datasources/soctemp | awk '{printf("%d",$1/1000)}'`
+
+if command -v vcgencmd >/dev/null 2>&1; then
+    CPU_TEMP=$(vcgencmd measure_temp 2>/dev/null | sed -n 's/^temp=\([0-9]*\).*/\1/p')
+elif [ -r /etc/armbianmonitor/datasources/soctemp ]; then
+    CPU_TEMP=$(awk '{printf "%.0f", $1 / 1000}' /etc/armbianmonitor/datasources/soctemp)
+elif [ -r /sys/class/thermal/thermal_zone0/temp ]; then
+    CPU_TEMP=$(awk '{printf "%.0f", $1 / 1000}' /sys/class/thermal/thermal_zone0/temp)
 else
-    CPU_TEMP=`/usr/bin/vcgencmd measure_temp | cut -c "6-9"`
+    CPU_TEMP=N/A
 fi
 
 STATUSES=""
