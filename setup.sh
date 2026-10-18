@@ -200,7 +200,7 @@ add_moonraker_config(){
                 [Yy] ) 
                     cat "${SCRIPT_DIR}/files/moonraker_config" >> "$config_path"
                     echo -e "\n> Added Moonraker update check." 
-                    reload_moonraker
+                    reload_service moonraker
                     break;;
                 [Nn] ) break;;
                 * ) echo -e "\nPlease answer y or n.";;
@@ -217,18 +217,29 @@ remove_moonraker_config(){
     if [ -n "$config_path" ] && [ -f "$config_path" ]; then
         sed -i "/$begin_marker/,/$end_marker/d" "$config_path"
         echo "> Removed Moonraker update check."
-        reload_moonraker
+        reload_service moonraker
     fi
 }
 
-reload_sshd(){
-    systemctl reload sshd.service
-    echo "> Reloaded sshd.service"
-}
+reload_service() {
+    local svc="$1"
 
-reload_moonraker(){
-    systemctl restart moonraker.service
-    echo "> Reloaded moonraker.service"
+    if command -v systemctl >/dev/null 2>&1; then
+        # Try systemd
+        if systemctl list-units --type=service --all | grep -q "^${svc}.service"; then
+            systemctl reload "${svc}.service" && echo "> Reloaded ${svc}.service (systemctl)"
+            return
+        fi
+    fi
+
+    if command -v service >/dev/null 2>&1; then
+        # Try SysVinit / Upstart
+        service "$svc" reload && echo "> Reloaded $svc (service)"
+        return
+    fi
+
+    echo "Could not reload '$svc' — no suitable method found." >&2
+    return 1
 }
 
 
@@ -248,7 +259,7 @@ fi
         -i | --install)
             backup_sshd_config
             install_motd
-            reload_sshd
+            reload_service sshd
             add_moonraker_config
             echo -e "\nKlipper MoTD has been succesfully installed.\n\nRun 'sudo motd-config' to set it up."
             exit 0
@@ -257,7 +268,7 @@ fi
             backup_sshd_config
             uninstall_motd
             remove_moonraker_config
-            reload_sshd
+            reload_service sshd
             echo -e "\nKlipper MoTD has been succesfully removed."
             exit 0
             ;;

@@ -69,6 +69,7 @@ Currently supported "flavors":
 - Pine64
 - OrangePi
 - VzBot
+- ZeroG
 
 #### Available variants
 Variant  1 (labels)

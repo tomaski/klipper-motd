@@ -23,6 +23,8 @@ FR="\e[38;2;255;0;0m"   # fysetc red
 PB="\e[38;5;39m"   # Pine64 blue
 OP="\e[38;5;214m"  # orangepi orange
 ZR="\e[38;5;196m"  # vzbot red
+QP="\e[38;5;61m"   # qidi purple
+ZG="\e[38;2;227;66;52m" # ZeroG red (#E34234)
 
 # define standard colors for rest of the text
 CW="\e[38;5;255m"  # color white
@@ -75,6 +77,12 @@ case ${OS_FLAVOR} in
         ;;
     "vzbot")
         FC=${ZR}
+        ;;
+    "qidi")
+        FC=${QP}
+        ;;
+    "zerog")
+        FC=${ZG}
         ;;
     *)
         FC=${CW}
